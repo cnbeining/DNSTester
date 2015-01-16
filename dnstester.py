@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  Beining --<>
-# Purpose: A most easy but powerful DNS pressure tester
+# Purpose: A most easy but powerful DNS tester
 # Created: 01/15/2015
 
 import os
@@ -28,7 +28,11 @@ def dns_amp(qname_address):
     c = DNS(id=1,qr=0,opcode=0,tc=0,rd=1,qdcount=1,ancount=0,nscount=0,arcount=0)
     c.qd=DNSQR(qname=qname_address,qtype=1,qclass=1)
     p = a/b/c
-    send(p)
+    try:
+        send(p)
+    except Exception as e:
+        print('WARNING: DNSTest failed: %s' % e)
+        traceback.print_exc()
 
 #----------------------------------------------------------------------
 def main(address, time, length, thread_num, fake_ip):
